@@ -1,0 +1,33 @@
+# Python derleme dosyaları
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Sanal ortamlar
+venv/
+env/
+.venv/
+.env/
+
+# IDE dosyaları
+.vscode/
+.idea/
+
+# Çıktı dosyaları
+*.log
+*.sqlite3
+*.db
+
+# OS dosyaları
+.DS_Store
+Thumbs.db
+
+# Test ve coverage
+htmlcov/
+.coverage
+.tox/
+.pytest_cache/
+
+# Diğer
+*.bak
+*.swp
