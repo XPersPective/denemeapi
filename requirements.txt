@@ -1,0 +1,27 @@
+# FastAPI Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Database
+sqlalchemy==2.0.35
+alembic==1.13.3
+
+# Pydantic (validation)
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# ASGI server
+uvicorn==0.30.6
+
+# Optional: Development tools
+python-dotenv==1.0.1
+
+# Optional: Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+httpx==0.27.2
+
+# Optional: Security (production)
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.12

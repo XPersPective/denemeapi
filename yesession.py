@@ -34,7 +34,6 @@ class UserDB(Base):
     username = Column(String, unique=True, index=True)
     api_key_hash = Column(String, unique=True, index=True)  # Güvenlik için hash'lenmiş
     created_at = Column(DateTime, default=datetime.now)
-    preferences = Column(JSON, default={})
     total_requests = Column(Integer, default=0)
 
 class SessionDB(Base):
@@ -56,11 +55,6 @@ Base.metadata.create_all(bind=engine)
 
 class UserCreate(BaseModel):
     username: str
-
-class UserPreferences(BaseModel):
-    theme: Optional[str] = None
-    language: Optional[str] = None
-    favorite_symbols: Optional[List[str]] = None
 
 class SessionInfo(BaseModel):
     is_active: bool
@@ -91,8 +85,7 @@ def create_user(db: Session, username: str) -> tuple[UserDB, str]:
     # Kullanıcıyı veritabanına kaydet
     db_user = UserDB(
         username=username,
-        api_key_hash=api_key_hash,
-        preferences={"theme": "dark", "language": "tr", "favorite_symbols": []}
+        api_key_hash=api_key_hash
     )
     db.add(db_user)
     db.commit()
