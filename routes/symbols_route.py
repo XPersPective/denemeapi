@@ -1,8 +1,9 @@
-from fastapi.params import Depends
-from fast_api import app
-from database.database  import UserDB, verify_api_key_and_session
+from fastapi import APIRouter
+from fastapi.params import Depends 
 
-@app.get("/symbols")
+route=APIRouter()
+
+@route.get("/symbols")
 async def get_symbols(user: UserDB = Depends(verify_api_key_and_session)):
     """
     Symbol listesini döner (API Key ve aktif session gerektirir)
