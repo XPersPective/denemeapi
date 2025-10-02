@@ -1,50 +1,45 @@
-import asyncio 
-import logging
-from contextlib import asynccontextmanager 
 from fastapi import FastAPI
-from routes import markets_route, candle_route, symbols_route
+from fastapi.middleware.cors import CORSMiddleware
+from core.database import engine, Base
+from routes import auth_route, symbols_route, markets_route, candles_route
+from pages import ui_routes
 
-# # Logging yapılandırması
-# logging.basicConfig(level=logging.INFO)
-# logger = logging.getLogger(__name__)
-
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     # Startup
-#     Base.metadata.create_all(bind=engine)
-#     # Background task'ı başlat
-#     update_task = asyncio.create_task(update_coin_prices())
-    
-#     yield
-    
-#     # Shutdown
-#     update_task.cancel()
-#     try:
-#         await update_task
-#     except asyncio.CancelledError:
-#         pass
+# Veritabanı tablolarını oluştur
+Base.metadata.create_all(bind=engine)
 
 # FastAPI app
 app = FastAPI(
-    title="Cryptocurrency API",
-    description="Modern cryptocurrency tracking API with WebSocket support",
+    title="Cryptocurrency Trading API",
+    description="Modern cryptocurrency tracking API with authentication",
     version="1.0.0",
-    # lifespan=lifespan
+    docs_url=None,
+    redoc_url=None
 )
 
 # CORS middleware
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
- 
-app.include_router(symbols_route.router, prefix="/symbols", tags=["Symbols"])
-app.include_router(markets_route.router, prefix="/markets", tags=["Markets"])
-app.include_router(candle_route.router, prefix="/candles", tags=["Candles"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Production'da spesifik origin'ler kullanın
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# UI Routes (Web sayfaları)
+app.include_router(ui_routes.router, tags=["Web UI"])
+
+# API Routes
+app.include_router(auth_route.router)
+app.include_router(symbols_route.router)
+# app.include_router(markets_route.router, prefix="/markets", tags=["Markets"])
+# app.include_router(candles_route.router, prefix="/candles", tags=["Candles"])
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

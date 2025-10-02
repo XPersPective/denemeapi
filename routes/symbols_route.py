@@ -1,12 +1,15 @@
-from fastapi import APIRouter
-from fastapi.params import Depends 
+from fastapi import APIRouter, Depends
+from models.auth_models import UserDB
+from dependencies.auth_dependencies import verify_api_key_and_session
 
-route=APIRouter()
+router = APIRouter(prefix="/symbols", tags=["Symbols"])
 
-@route.get("/symbols")
+@router.get("/")
 async def get_symbols(user: UserDB = Depends(verify_api_key_and_session)):
     """
     Symbol listesini döner (API Key ve aktif session gerektirir)
+    
+    Authentication: API Key veya Session Token gereklidir
     """
     symbols = [
         {"symbol": "BTCUSDT", "name": "Bitcoin/USDT", "type": "crypto"},
@@ -22,6 +25,7 @@ async def get_symbols(user: UserDB = Depends(verify_api_key_and_session)):
     ]
     
     return {
+        "success": True,
         "user": user.username,
         "symbols": symbols,
         "total": len(symbols)
