@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from core.database import Base
 
 class UserDB(Base):
@@ -18,6 +19,9 @@ class UserDB(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
+    
+    # Relationship
+    preferences = relationship("UserPreferencesDB", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
 
 class SessionDB(Base):

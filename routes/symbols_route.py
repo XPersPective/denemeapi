@@ -1,32 +1,42 @@
+
 from fastapi import APIRouter, Depends
 from models.auth_models import UserDB
 from dependencies.auth_dependencies import verify_api_key_and_session
+from services.user_preferences_service import UserPreferencesService
+from core.database import get_db
+from services.symbols_service import SymbolsService
+from models.symbol_models import SymbolsResponse
+import time
 
 router = APIRouter(prefix="/symbols", tags=["Symbols"])
 
 @router.get("/")
-async def get_symbols(user: UserDB = Depends(verify_api_key_and_session)):
+async def get_symbols(
+    user: UserDB = Depends(verify_api_key_and_session),
+    db=Depends(get_db)
+):
     """
-    Symbol listesini döner (API Key ve aktif session gerektirir)
-    
-    Authentication: API Key veya Session Token gereklidir
+    Kullanıcının tercih ettiği marketten sembol listesini döner
     """
-    symbols = [
-        {"symbol": "BTCUSDT", "name": "Bitcoin/USDT", "type": "crypto"},
-        {"symbol": "ETHUSDT", "name": "Ethereum/USDT", "type": "crypto"},
-        {"symbol": "BNBUSDT", "name": "Binance Coin/USDT", "type": "crypto"},
-        {"symbol": "SOLUSDT", "name": "Solana/USDT", "type": "crypto"},
-        {"symbol": "XRPUSDT", "name": "Ripple/USDT", "type": "crypto"},
-        {"symbol": "ADAUSDT", "name": "Cardano/USDT", "type": "crypto"},
-        {"symbol": "DOGEUSDT", "name": "Dogecoin/USDT", "type": "crypto"},
-        {"symbol": "MATICUSDT", "name": "Polygon/USDT", "type": "crypto"},
-        {"symbol": "AVAXUSDT", "name": "Avalanche/USDT", "type": "crypto"},
-        {"symbol": "DOTUSDT", "name": "Polkadot/USDT", "type": "crypto"}
-    ]
-    
-    return {
-        "success": True,
-        "user": user.username,
-        "symbols": symbols,
-        "total": len(symbols)
-    }
+    try:
+        preferences = UserPreferencesService.get_user_preferences(user.id, db)
+        if not preferences or not preferences.market:
+            raise ValueError("Kullanıcı tercihinde market bulunamadı.")
+        market_id = preferences.market
+        service = SymbolsService()
+        symbols = service.get_symbols(market_id)
+        return SymbolsResponse(
+            success=True,
+            symbols=symbols,
+            timestamp=int(time.time() * 1000),
+            market_id=market_id,
+            count=len(symbols)
+        )
+    except Exception as e:
+        return SymbolsResponse(
+            success=False,
+            symbols=[],
+            timestamp=int(time.time() * 1000),
+            market_id=None,
+            count=0
+        )

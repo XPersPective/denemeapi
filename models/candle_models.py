@@ -46,4 +46,4 @@ class Candles(BaseModel):
     Mum (candle) listesini ve verinin kaynağını (provider) dönen modeldir.
     """
     candles: List[Candle]              # Mum listesini içerir
-    provider: str                      # Verinin kaynağı (örn. 'binance', 'coingecko')
+    market_id: str                      # Verinin kaynağı (örn. 'binance', 'coingecko')

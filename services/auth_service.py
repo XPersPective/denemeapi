@@ -43,7 +43,7 @@ class AuthService:
     @staticmethod
     def create_user(db: Session, user_data: UserCreate) -> UserDB:
         """
-        Yeni kullanıcı oluşturur
+        Yeni kullanıcı oluşturur ve varsayılan tercihleri ayarlar
         """
         # Kullanıcı adı kontrolü
         existing_user = db.query(UserDB).filter(
@@ -75,6 +75,10 @@ class AuthService:
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+        
+        # Varsayılan kullanıcı tercihlerini oluştur
+        from services.user_preferences_service import UserPreferencesService
+        UserPreferencesService.create_default_preferences(new_user.id, db)
         
         return new_user
     

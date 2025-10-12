@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import engine, Base
-from routes import auth_route, symbols_route, markets_route, candles_route
+from routes import auth_route, symbols_route, markets_route, candles_route, user_preferences_route
 from pages import ui_routes
 
 # Veritabanı tablolarını oluştur
@@ -30,6 +30,7 @@ app.include_router(ui_routes.router, tags=["Web UI"])
 
 # API Routes
 app.include_router(auth_route.router)
+app.include_router(user_preferences_route.router)
 app.include_router(symbols_route.router)
 # app.include_router(markets_route.router, prefix="/markets", tags=["Markets"])
 # app.include_router(candles_route.router, prefix="/candles", tags=["Candles"])
