@@ -23,10 +23,8 @@ class SymbolSchema(Base):
 
 class SymbolsResponse(BaseModel):
     """Genel sembol yanıt modeli"""
-    success: bool
+    timestamp: int  # Yanıt zamanı, milisaniye cinsinden (Unix epoch)
     symbols: List[Symbol]
-    timestamp: int # Yanıt zamanı, milisaniye cinsinden (Unix epoch) 
-    market_id: Optional[str] = None
     count: int
 
     class Config:

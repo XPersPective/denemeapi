@@ -1,5 +1,4 @@
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from models.auth_models import UserDB
 from dependencies.auth_dependencies import verify_api_key_and_session
 from services.user_preferences_service import UserPreferencesService
@@ -10,7 +9,7 @@ import time
 
 router = APIRouter(prefix="/symbols", tags=["Symbols"])
 
-@router.get("/")
+@router.get("/", response_model=SymbolsResponse)
 async def get_symbols(
     user: UserDB = Depends(verify_api_key_and_session),
     db=Depends(get_db)
@@ -19,24 +18,23 @@ async def get_symbols(
     Kullanıcının tercih ettiği marketten sembol listesini döner
     """
     try:
+        # Kullanıcı tercihlerini çek
         preferences = UserPreferencesService.get_user_preferences(user.id, db)
         if not preferences or not preferences.market:
             raise ValueError("Kullanıcı tercihinde market bulunamadı.")
+        
         market_id = preferences.market
+        
+        # Sembolleri çek
         service = SymbolsService()
         symbols = service.get_symbols(market_id)
+        
         return SymbolsResponse(
-            success=True,
-            symbols=symbols,
             timestamp=int(time.time() * 1000),
-            market_id=market_id,
+            symbols=symbols,
             count=len(symbols)
         )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        return SymbolsResponse(
-            success=False,
-            symbols=[],
-            timestamp=int(time.time() * 1000),
-            market_id=None,
-            count=0
-        )
+        raise HTTPException(status_code=500, detail=f"Sunucu hatası: {str(e)}")

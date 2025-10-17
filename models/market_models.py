@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
-from models.response_models import APIResponse
 from sqlalchemy import Column, String
 from core.database import Base
 
@@ -11,12 +10,9 @@ class Market(BaseModel):
     rate_limits: Dict[str, Any]  # Marketin rate limit bilgileri (örn. {'requests_per_minute': 1200})
     website: str             # Marketin resmi web sitesi
 
-class MarketsResponse(): 
-    success: bool                  # İstek başarılı mı?
-    message: Optional[str] = None  # Hata veya bilgi mesajı (opsiyonel)
-    timestamp: int # Yanıt zamanı, milisaniye cinsinden (Unix epoch)
-    markets: List[Market]   
-    current_market_id: str    # Verinin kaynağı, örnek binance
+class MarketsResponse(BaseModel): 
+    timestamp: int  # Yanıt zamanı, milisaniye cinsinden (Unix epoch)
+    markets: List[Market] 
 
 # Örnek kullanım:
 # binance_market = Market(

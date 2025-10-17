@@ -11,8 +11,8 @@ class SymbolsService:
     def __init__(self):
         self.market_manager = MarketAPIServiceManager()
 
-    def get_symbols(self, market_id: str) -> List[Symbol]:
+    def get_symbols(self) -> List[Symbol]:
         """
         Market id'ye göre sembol listesini döndürür
         """
-        return self.market_manager.get_symbols(market_id)
+        return self.market_manager.get_symbols()
